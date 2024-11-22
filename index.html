@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>5s9 Celerity</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <!-- Firebase SDK -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.5.0/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.5.0/firebase-auth-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.5.0/firebase-firestore-compat.min.js"></script>
+    <style>
+      /* Styles with navy and violet theme */
+    :root {
+      --primary-color: #1E40AF;
+      --secondary-color: #7C3AED;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--primary-color);
+      color: #fff;
+      padding-bottom: 60px;
+    }
+
+    header {
+      background-color: var(--secondary-color);
+      padding: 0.1rem;
+      text-align: center;
+    }
+
+    nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: var(--primary-color);
+      display: flex;
+      justify-content: space-around;
+      padding: 0.5rem 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.8rem;
+      opacity: 0.8;
+      transition: opacity 0.3s;
+    }
+
+    nav a:hover {
+      opacity: 1;
+    }
+
+    nav a i {
+      margin-bottom: 0.25rem;
+      font-size: 1.2rem;
+    }
+
+    .content {
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .subject-card {
+      background-color: var(--secondary-color);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .subject-card:hover {
+      transform: translateX(10px);
+    }
+
+    .subject-card i {
+      font-size: 2rem;
+      margin-right: 1rem;
+    }
+
+    .subject-card h3 {
+      margin: 0;
+    }
+    
+    /* Styles pour les pages supplémentaires */
+    .course-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+
+    .course-card {
+      background-color: var(--secondary-color);
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+    }
+
+    .profile-section {
+      background-color: var(--secondary-color);
+      border-radius: 0.5rem;
+      padding: 2rem;
+      margin-bottom: 1rem;
+    }
+
+        /* Styles du chatbot */
+        
+        .chatbot-container {
+      background-color: var(--secondary-color);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      height: 500px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-messages {
+      flex-grow: 1;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+    }
+
+    .chat-input {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .chat-input input {
+      flex-grow: 1;
+      padding: 0.5rem;
+      border: none;
+      border-radius: 0.25rem;
+    }
+
+    .chat-input button {
+      padding: 0.5rem 1rem;
+      background-color: var(--primary-color);
+      border: none;
+      border-radius: 0.25rem;
+      color: white;
+      cursor: pointer;
+    }
+    
+        .chat-message {
+            margin: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 70%;
+        }
+
+        .user-message {
+            background-color: #1E40AF;
+            margin-left: auto;
+        }
+
+        .bot-message {
+            background-color: #7C3AED;
+            margin-right: auto;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 10px;
+            color: #ffffff;
+        }
+        
+        /* Styles pour le blog et l'authentification */
+        .blog-post {
+            background-color: var(--secondary-color);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .blog-post:hover {
+            transform: translateY(-5px);
+        }
+
+        .blog-meta {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+
+        .auth-form {
+            background-color: var(--secondary-color);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            max-width: 400px;
+            margin: 2rem auto;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: none;
+            border-radius: 0.25rem;
+        }
+
+        .auth-button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .auth-button:hover {
+            opacity: 0.9;
+        }
+
+        .profile-data {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .blog-categories {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .blog-category {
+            background-color: var(--primary-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+  <header>
+    <h1>5s9 Celerity</h1>
+  </header>
+  <!-- Page d'accueil -->
+  <div class="content" id="home">
+    <h2>Coming Soon</h2>
+  </div>
+    <!-- Autres matières comme dans votre code original -->
+  </div>
+  <!-- Page des cours -->
+  <div class="content" id="courses" style="display: none;">
+    <h2>Matières</h2>
+    <div class="subject-card">
+      <i class="fas fa-calculator"></i>
+      <h3>Mathematics</h3>
+    </div>
+    <div class="subject-card">
+      <i class="fas fa-atom"></i>
+      <h3>Physics</h3>
+    </div>
+    <div class="subject-card">
+      <i class="fas fa-flask"></i>
+      <h3>Chemistry</h3>
+    </div>
+    <div class="subject-card">
+      <i class="fas fa-microscope"></i>
+      <h3>Biology</h3>
+    </div>
+    <div class="subject-card">
+      <i class="fas fa-mountain"></i>
+      <h3>Geology</h3>
+    </div>
+    <div class="subject-card">
+      <i class="fas fa-book-open"></i>
+      <h3>English</h3>
+    </div>
+    <div class="subject-card">
+      <i class="fas fa-book-open"></i>
+      <h3>French</h3>
+    </div>
+    <div class="subject-card">
+      <i class="fas fa-landmark"></i>
+      <h3>History</h3>
+    </div>
+    <div class="subject-card">
+      <i class="fas fa-globe"></i>
+      <h3>Geography</h3>
+    </div>
+    <div class="subject-card">
+      <i class="fas fa-brain"></i>
+      <h3>Philosophy</h3>
+    </div>
+    <div class="subject-card">
+      <i class="fas fa-university"></i>
+      <h3>General Culture</h3>
+    </div>
+  </div>
+  <!-- Page profil -->
+  <div class="content" id="profile" style="display: none;">
+    <!-- Formulaire d'authentification -->
+        <div id="auth-content" class="auth-form">
+            <h2>Connexion</h2>
+            <input type="email" id="email" placeholder="Email" class="auth-input">
+            <input type="password" id="password" placeholder="Mot de passe" class="auth-input">
+            <button onclick="signIn(document.getElementById('email').value, document.getElementById('password').value)" class="auth-button">
+                Se connecter
+            </button>
+            <p>Pas encore de compte ? <a href="#" onclick="showSignUp()">S'inscrire</a></p>
+        </div>
+        <!-- Contenu du profil -->
+        <div id="profile-content" style="display: none;">
+            <!-- Contenu chargé dynamiquement -->
+        </div>
+    <!--  <div class="profile-section"> -->
+  </div>
+  <!-- Page blog -->
+  <div class="content" id="blog" style="display: none;">
+    <h2>Blog Éducatif</h2>
+    <div class="blog-post">
+      <h3>Dernières actualités éducatives</h3>
+      <p>Date: 31 octobre 2024</p>
+      <p>Contenu du post...</p>
+    </div>
+    <div id="blog-content">
+            <!-- Articles chargés dynamiquement -->
+    </div>
+  </div>
+  <!-- Page chatbot -->
+  <div class="content" id="chatbot" style="display: none;">
+    <h2>Assistant Personnel</h2>
+    <!-- Ajoutez ceci dans votre section chatbot existante -->
+    <div class="chatbot-container">
+      <div class="chat-messages" id="chat-messages">
+      <!-- Les messages s'afficheront ici -->
+        <div class="chat-message bot-message">
+          Bonjour ! Comment puis-je vous aider avec vos études aujourd'hui ?
+        </div>
+      </div>
+      <div class="typing-indicator" id="typing-indicator">
+      L'assistant écrit...
+      </div>
+      <div class="chat-input">
+        <input type="text" id="user-input" placeholder="Posez votre question...">
+        <button onclick="sendMessage()">Envoyer</button>
+      </div>
+    </div>
+  </div>
+  <nav>
+    <a href="#" onclick="showPage('home')">
+      <i class="fas fa-home"></i>
+      Accueil
+    </a>
+    <a href="#" onclick="showPage('courses')">
+      <i class="fas fa-graduation-cap"></i>
+      Cours
+    </a>
+    <a href="#" onclick="showPage('profile')">
+      <i class="fas fa-user-cog"></i>
+      Profil
+    </a>
+    <a href="#" onclick="showPage('blog')">
+      <i class="fas fa-blog"></i>
+      Blog
+    </a>
+    <!-- <a href="#" onclick="showPage('chatbot')">
+      <i class="fas fa-robot"></i>
+      Chatbot
+    </a> -->
+  </nav>
+  <script>
+    function showPage(pageId) {
+      // Cacher toutes les pages
+      document.querySelectorAll('.content').forEach(page => {
+        page.style.display = 'none';
+      });
+      
+      // Afficher la page sélectionnée
+      document.getElementById(pageId).style.display = 'block';
+    }
+  </script>
+  <!-- Configuration Firebase -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "VOTRE_API_KEY",
+            authDomain: "votre-app.firebaseapp.com",
+            projectId: "votre-projet-id",
+            storageBucket: "votre-app.appspot.com",
+            messagingSenderId: "votre-messaging-id",
+            appId: "votre-app-id"
+        };
+
+        // Initialiser Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Gestion de l'état de l'authentification
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                document.getElementById('auth-content').style.display = 'none';
+                document.getElementById('profile-content').style.display = 'block';
+                loadUserProfile(user);
+                loadUserProgress(user.uid);
+            } else {
+                document.getElementById('auth-content').style.display = 'block';
+                document.getElementById('profile-content').style.display = 'none';
+            }
+        });
+
+        // Fonctions d'authentification
+        async function signIn(email, password) {
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+            } catch (error) {
+                alert("Erreur de connexion : " + error.message);
+            }
+        }
+
+        async function signUp(email, password, name) {
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                await db.collection('users').doc(userCredential.user.uid).set({
+                    name: name,
+                    email: email,
+                    createdAt: new Date(),
+                    progress: {}
+                });
+            } catch (error) {
+                alert("Erreur d'inscription : " + error.message);
+            }
+        }
+
+        function signOut() {
+            auth.signOut();
+        }
+
+        // Fonctions pour le blog
+        async function loadBlogPosts() {
+            const blogContent = document.getElementById('blog-content');
+            blogContent.innerHTML = '';
+
+            try {
+                const posts = await db.collection('blog_posts')
+                    .orderBy('createdAt', 'desc')
+                    .limit(10)
+                    .get();
+
+                posts.forEach(post => {
+                    const data = post.data();
+                    const postElement = createBlogPostElement(data);
+                    blogContent.appendChild(postElement);
+                });
+            } catch (error) {
+                console.error("Erreur de chargement des articles:", error);
+            }
+        }
+
+        function createBlogPostElement(post) {
+            const div = document.createElement('div');
+            div.className = 'blog-post';
+            div.innerHTML = `
+                <h3>${post.title}</h3>
+                <div class="blog-meta">
+                    <span>Par ${post.author}</span> • 
+                    <span>${new Date(post.createdAt.toDate()).toLocaleDateString()}</span>
+                </div>
+                <div class="blog-categories">
+                    ${post.categories.map(cat => `
+                        <span class="blog-category">${cat}</span>
+                    `).join('')}
+                </div>
+                <p>${post.excerpt}</p>
+            `;
+            return div;
+        }
+
+        // Fonctions pour le profil utilisateur
+        async function loadUserProfile(user) {
+            const profileData = await db.collection('users').doc(user.uid).get();
+            const data = profileData.data();
+
+            document.getElementById('profile-content').innerHTML = `
+                <h2>Mon Profil</h2>
+                <div class="profile-data">
+                    <p><strong>Nom:</strong> ${data.name}</p>
+                    <p><strong>Email:</strong> ${user.email}</p>
+                    <h3>Ma Progression</h3>
+                    <div id="progress-content"></div>
+                    <button class="auth-button" onclick="signOut()">Se déconnecter</button>
+                </div>
+            `;
+        }
+
+        async function loadUserProgress(userId) {
+            // Charger la progression depuis Firestore
+            const progressData = await db.collection('users')
+                .doc(userId)
+                .collection('progress')
+                .get();
+
+            let progressHtml = '<div class="progress-grid">';
+            progressData.forEach(doc => {
+                const progress = doc.data();
+                progressHtml += `
+                    <div class="progress-item">
+                        <h4>${progress.subject}</h4>
+                        <p>Progression: ${progress.percentage}%</p>
+                    </div>
+                `;
+            });
+            progressHtml += '</div>';
+            document.getElementById('progress-content').innerHTML = progressHtml;
+        }
+    </script>
+  <!-- Script pour Dialogflow -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js">
+  </script>
+  <script>
+        // Configuration Dialogflow
+        const DIALOGFLOW_PROJECT_ID = 'VOTRE_PROJECT_ID';
+        const DIALOGFLOW_SESSION_ID = generateSessionId();
+        const BACKEND_URL = 'https://votre-backend.com/dialogflow-proxy'; // URL de votre backend
+
+        // Générer un ID de session unique pour chaque utilisateur
+        function generateSessionId() {
+            return 'session-' + Math.random().toString(36).substring(7);
+        }
+
+        // Ajouter un message au chat
+        function addMessage(message, isUser = false) {
+            const messagesDiv = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${isUser ? 'user-message' : 'bot-message'}`;
+            messageDiv.textContent = message;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // Afficher/masquer l'indicateur de frappe
+        function toggleTypingIndicator(show) {
+            const indicator = document.getElementById('typing-indicator');
+            indicator.style.display = show ? 'block' : 'none';
+        }
+
+        // Envoyer un message à Dialogflow
+        async function sendToDialogflow(text) {
+            try {
+                const response = await axios.post(BACKEND_URL, {
+                    projectId: DIALOGFLOW_PROJECT_ID,
+                    sessionId: DIALOGFLOW_SESSION_ID,
+                    text: text
+                });
+
+                return response.data.fulfillmentText;
+            } catch (error) {
+                console.error('Erreur lors de la communication avec Dialogflow:', error);
+                return "Désolé, je rencontre des difficultés techniques. Veuillez réessayer plus tard.";
+            }
+        }
+
+        // Gérer l'envoi de message
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const message = input.value.trim();
+            
+            if (message) {
+                // Afficher le message de l'utilisateur
+                addMessage(message, true);
+                input.value = '';
+
+                // Afficher l'indicateur de frappe
+                toggleTypingIndicator(true);
+
+                // Obtenir la réponse de Dialogflow
+                const response = await sendToDialogflow(message);
+
+                // Masquer l'indicateur de frappe et afficher la réponse
+                toggleTypingIndicator(false);
+                addMessage(response);
+            }
+        }
+
+        // Gérer l'envoi avec la touche Entrée
+        document.getElementById('user-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+  </script>
+  <!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/6723d03f4304e3196adb5526/1ibhuau0n';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
+</body>
+</html>
